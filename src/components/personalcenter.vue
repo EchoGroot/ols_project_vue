@@ -34,13 +34,13 @@
               <span>已接受任务</span>
             </template>
             <!-- 二级子菜单 -->
-            <el-menu-item index="/acceptfinish">
+            <el-menu-item index="/acceptetasklist/acceptfinish">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>已完成</span>
               </template>
             </el-menu-item>
-            <el-menu-item index="/acceptnotfinish">
+            <el-menu-item index="/acceptetasklist/acceptnotfinish">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>未完成</span>
@@ -54,13 +54,13 @@
               <span>已发布任务</span>
             </template>
             <!-- 二级子菜单 -->
-            <el-menu-item index="/releasefinish">
+            <el-menu-item index="/releasetasklist/releasefinish">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>已完成</span>
               </template>
             </el-menu-item>
-            <el-menu-item index="/releasenotfinish">
+            <el-menu-item index="/releasetasklist/releasenotfinish">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>未完成</span>
@@ -72,11 +72,34 @@
       </el-aside>
       <!-- 主体结构 -->
       <el-main>
-        <router-view></router-view>
+        <router-view v-if="isRouterAlive"></router-view>
       </el-main>
     </el-container>
   </el-container>
 </template>
+
+<script>
+export default {
+  provide () {
+    return {
+      reload: this.reload
+    }
+  },
+  data () {
+    return {
+      isRouterAlive: true
+    }
+  },
+  methods: {
+    reload () {
+      this.isRouterAlive = false
+      this.$nextTick(function () {
+        this.isRouterAlive = true
+      })
+    }
+  }
+}
+</script>
 
 <style scoped>
 .home-container {

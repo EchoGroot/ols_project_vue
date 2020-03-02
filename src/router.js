@@ -3,27 +3,27 @@ import VueRouter from 'vue-router'
 import welcome from './components/welcome.vue'
 import personalcenter from './components/personalcenter.vue'
 import personalinfo from './components/personalinfo.vue'
-import acceptfinish from './components/acceptfinish.vue'
-import acceptnotfinish from './components/acceptnotfinish.vue'
-import releasefinish from './components/releasefinish.vue'
-import releasenotfinish from './components/releasenotfinish.vue'
+import releasetasklist from './components/releasetasklist.vue'
+import acceptetasklist from './components/acceptetasklist.vue'
 import changepassword from './components/changepassword.vue'
+import showimagelabel from './components/showimagelabel.vue'
+import imagelabelhome from './components/imagelabelhome.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   { path: '/', redirect: '/personalcenter' },
   { path: '/welcome', component: welcome },
+  { path: '/showimagelabel', component: showimagelabel },
+  { path: '/imagelabelhome', component: imagelabelhome },
   {
     path: '/personalcenter',
     component: personalcenter,
     children: [
       { path: '/', redirect: '/personalinfo' },
       { path: '/personalinfo', component: personalinfo },
-      { path: '/acceptfinish', component: acceptfinish },
-      { path: '/acceptnotfinish', component: acceptnotfinish },
-      { path: '/releasefinish', component: releasefinish },
-      { path: '/releasenotfinish', component: releasenotfinish },
+      { path: '/acceptetasklist/:query', component: acceptetasklist },
+      { path: '/releasetasklist/:query', component: releasetasklist },
       { path: '/changepassword', component: changepassword }
     ]
   }
