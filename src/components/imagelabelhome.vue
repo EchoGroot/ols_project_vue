@@ -5,7 +5,10 @@
         <!-- 顶部标题 -->
         <span>任务详情</span>
       </div>
-      <el-button type="info"> 返回 </el-button>
+      <el-button
+        type="info"
+        @click="goBack"
+      > 返回 </el-button>
     </el-header>
     <el-main class='bottomContainer'>
       <!-- 任务详情 -->
@@ -18,9 +21,29 @@
         :readonly="true"
         v-text="task.information"
       ></textarea>
+      <!-- 标注示例 -->
+      <el-row v-if="exampleShowFlag">
+        <span class="tittle">标注示例 {{imageExampleList.length}}</span>
+        <hr>
+        <div
+          v-for="(item, index) in imageExampleList"
+          :key="index"
+          class="imgContainer"
+        >
+          <img
+            :src="imageUrl+item.originalImage"
+            class="imgStyle"
+          >
+          <el-button
+            @click="gotoshowimagelabel(imageUrl+item.originalImage)"
+            type="success"
+            round
+          >查看</el-button>
+        </div>
+      </el-row>
       <!-- 未标注 -->
-      <div class="imgContainerParent">
-        <span class="tittle">未标注 {{imageNotFinishlist.length}}</span>
+      <el-row v-if="notFinishShowFlag">
+        <span class="tittle">{{tittle}} {{imageNotFinishlist.length}}</span>
         <hr>
         <div
           v-for="(item, index) in imageNotFinishlist"
@@ -31,16 +54,31 @@
             :src="imageUrl+item.originalImage"
             class="imgStyle"
           >
-          <el-button
-            class="label"
-            type="primary"
-            round
-            @click="gotoImageLabel(imageUrl+item.originalImage)"
-          >标注</el-button>
+          <div class="lookAndLabel">
+            <el-button
+              @click="gotoshowimagelabel(imageUrl+item.originalImage)"
+              type="success"
+              round
+            >查看</el-button>
+            <el-button
+              class="label"
+              type="primary"
+              round
+            >
+              <!-- @click="gotoImageLabel1(imageUrl+item.originalImage)" -->
+              <!-- 打包上线时需要修改链接 -->
+              <a
+                target="_blank"
+                :href="'http://127.0.0.1:8080/ImageLabelPage/index.html?imageUrl='+imageUrl+item.originalImage"
+              >
+                标注
+              </a>
+            </el-button>
+          </div>
         </div>
-      </div>
+      </el-row>
       <!-- 已标注 -->
-      <div class="imgContainerParent">
+      <el-row v-if="finishShowFlag">
         <span class="tittle">已标注 {{imageFinishlist.length}}</span>
         <hr>
         <div
@@ -59,13 +97,20 @@
               round
             >查看</el-button>
             <el-button
+              v-if="labelAgainShowFlag"
               type="primary"
               round
-              @click="gotoImageLabel(imageUrl+item.originalImage)"
-            >重新标注</el-button>
+              @click="gotoshowimagelabel(imageUrl+item.originalImage)"
+            >
+              <!-- :href="'http://127.0.0.1:8080/ImageLabelPage/index.html?imageUrl='+imageUrl+item.originalImage" -->
+              <!-- 打包上线时需要修改链接 -->
+              <a target="_blank">
+                重新标注
+              </a>
+            </el-button>
           </div>
         </div>
-      </div>
+      </el-row>
     </el-main>
   </el-container>
 </template>
@@ -76,21 +121,51 @@ import { imageLabel } from '../assets/scripts/jquery.imageLabel.min.js'
 export default {
   data () {
     return {
+      tittle: '',
+      labelAgainShowFlag: false,
+      exampleShowFlag: false,
+      finishShowFlag: false,
+      notFinishShowFlag: false,
+      pageType: '',
+      userId: 0,
       task: {
-        id: 10003,
-        accepteId: 10003,
-        name: 're任务name',
-        information: '的萨阿迪建行卡硕大的大所多案例看动画时间按快点好骄傲是看了觉得和卡拉是经典款立刻就打算考虑进来看大神',
-        releaseTime: '20190812',
-        accepteTime: '20200101',
-        points: 25
+        accepteId: 0,
+        name: '',
+        information: '',
+        releaseTime: '',
+        accepteTime: '',
+        points: 0
       },
+      imageExampleList: [],
       imageFinishlist: [],
       imageNotFinishlist: [],
       imageUrl: 'http://yuyy.info/image/ols/'
     }
   },
   created () {
+    // 获取URL中的参数
+    this.pageType = this.$route.query.pageType
+    switch (this.pageType) {
+      case 'personalAcceptNotFinishPage':
+        // 显示重新标注按钮
+        this.labelAgainShowFlag = true
+        this.tittle = '未标注'
+        break
+      case 'personalAcceptFinishPage':
+
+        break
+      case 'otherReleasePage':
+        this.tittle = '标注任务'
+        break
+      case 'personalReleasePage':
+        this.tittle = '标注任务'
+        break
+      case 'judgePage':
+        this.tittle = '标注任务'
+        break
+    }
+    this.task.accepteId = this.$route.query.accepteId
+    this.userId = this.$route.query.userId
     this.getAccepteImageList()
     $(function () {
       $('.right-select-box')
@@ -99,6 +174,9 @@ export default {
   methods: {
     gotoshowimagelabel (imageUrlParam) {
       this.$router.push('/showimagelabel?imageUrlParam=' + imageUrlParam)
+    },
+    gotoImageLabel1 (imageUrlParam) {
+      this.$router.push('/imagelabel?imageUrlParam=' + imageUrlParam)
     },
     gotoImageLabel (imageUrlParam) {
       var that = this
@@ -176,11 +254,12 @@ export default {
       })
     },
     async getAccepteImageList () {
-      var url = 'task/getAccepteImageListByAccepteId'
+      var url = 'task/getAcceptImageListByAcceptId'
       console.log('发送请求获取接受任务图片数据:' + url)
       const { data: res } = await this.$http.get(url, {
         params: {
-          accepteId: this.task.accepteId
+          acceptId: this.task.accepteId,
+          userId: this.userId
         }
       })
       console.log(res)
@@ -191,9 +270,23 @@ export default {
       // 如果返回状态正常，将请求的数据保存在data中
       var accepteImageList = JSON.parse(res.data.taskImage.ols_accepte_url)
       console.log(accepteImageList)
+      // 标签存到session
+      window.sessionStorage.setItem(
+        this.task.accepteId + 'labelName',
+        JSON.stringify(accepteImageList.labelName)
+      )
       for (let i = 0; i < accepteImageList.taskImage.length; i++) {
         console.log(accepteImageList.taskImage[i])
-        if (accepteImageList.taskImage[i].isLabeled) {
+        if (accepteImageList.taskImage[i].isExample) {
+          this.exampleShowFlag = true
+          this.imageExampleList.push(accepteImageList.taskImage[i])
+          // 标注信息存本地session
+          window.sessionStorage.setItem(
+            this.imageUrl + accepteImageList.taskImage[i].originalImage,
+            JSON.stringify(accepteImageList.taskImage[i].labeledInfo)
+          )
+        } else if (accepteImageList.taskImage[i].isLabeled) {
+          this.finishShowFlag = true
           this.imageFinishlist.push(accepteImageList.taskImage[i])
           // 标注信息存本地session
           window.sessionStorage.setItem(
@@ -201,22 +294,28 @@ export default {
             JSON.stringify(accepteImageList.taskImage[i].labeledInfo)
           )
         } else {
+          this.notFinishShowFlag = true
           this.imageNotFinishlist.push(accepteImageList.taskImage[i])
         }
       }
-      // this.imagelist = accepteImageList.taskImage
-      // console.log('imageList:' + this.imagelist)
       this.task.name = res.data.taskImage.name
       this.task.information = res.data.taskImage.information
       this.task.accepteTime = res.data.taskImage.accept_time
       this.task.releaseTime = res.data.taskImage.release_time
       this.task.points = res.data.taskImage.points
+    },
+    goBack () {
+      // 注意判断是vue页面还是其他页面
+      this.$router.go(-1)
     }
   }
 }
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+}
 textarea {
   margin-right: 14px;
   width: 100%;

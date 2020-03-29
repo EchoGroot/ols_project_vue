@@ -68,8 +68,7 @@ export default {
     return {
       // 获取查询用户信息的参数
       queryInfo: {
-        // id需要修改
-        id: 11003,
+        id: 0,
         query: '',
         pagenum: 1,
         pagesize: 10
@@ -80,8 +79,10 @@ export default {
     }
   },
   created () {
-    console.log('tasklist.vue--created:' + this.$route.params.query)
-    this.queryInfo.query = this.$route.params.query
+    console.log('this.$route.query:')
+    console.log(this.$route.query)
+    this.queryInfo.query = this.$route.query.query
+    this.queryInfo.id = this.$route.query.userId
     this.getTaskList()
   },
   methods: {
@@ -125,18 +126,14 @@ export default {
       console.log('页码发生改变时触发' + current)
       // 页码发生改变时触发当current发生改变的时候，我们应该
       // 以最新的current页码来请求数据并展示数据
-      //   console.log(current)
       this.queryInfo.pagenum = current
       // 重新按照pagenum发送请求，请求最新的数据
       this.getTaskList()
     }
   },
   watch: {
-    '$route.params.query': function (newVal, oldVal) {
+    '$route.query': function (newVal, oldVal) {
       console.log('路由参数发生改变' + oldVal + '->' + newVal)
-      // this.$router.push('/tasklist/' + newVal)
-      // this.queryInfo.query = newVal
-      // this.getTaskList()
       this.reload()
     }
   }

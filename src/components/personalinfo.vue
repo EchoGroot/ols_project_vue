@@ -38,6 +38,7 @@
 export default {
   data () {
     return {
+      userId: '',
       user: {
         name: '',
         sex: '',
@@ -48,11 +49,17 @@ export default {
     }
   },
   created () {
-    this.getuserinfo()
+    this.userId = this.$route.query.userId
+    if (this.userId !== null && this.userId !== '') {
+      this.getuserinfo()
+    } else {
+      this.$message.error('请先登录')
+      // 跳转到登录界面
+    }
   },
   methods: {
     async getuserinfo () {
-      var { data: res } = await this.$http.post('user/getUserInfo', { id: '10000' })
+      var { data: res } = await this.$http.post('user/getUserInfo', { userId: this.userId })
       console.log(res)
       if (res.meta.status !== '200') return this.$message.error(res.meta.msg)
       this.user.name = res.data.userInfo.name
@@ -63,7 +70,7 @@ export default {
       this.user.points = res.data.userInfo.points
     },
     gotochangepassword () {
-      this.$router.push('/changepassword')
+      this.$router.push('/changepassword?userId=' + this.userId)
     }
   }
 }

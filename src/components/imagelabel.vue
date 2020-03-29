@@ -43,7 +43,13 @@
             -webkit-box-align:center;
             -webkit-box-pack:center;
           ">
-            <div :style="imgstyle">
+            <div
+              @mousedown="mousedown"
+              @mousemove="mousemove"
+              @mouseup="mouseup"
+              @Mouseleave="Mouseleave"
+              :style="imgstyle"
+            >
               <img
                 :src="imgSrc"
                 :style="imgstyle"
@@ -150,6 +156,7 @@ export default {
         img.src = this.imgSrc
         const that = this
         img.onload = function () {
+          // let canvasleft = 0
           const canvasleft = 0
           let canvastop = 0
           const WrH = img.width / img.height // 图片宽高比
@@ -169,6 +176,9 @@ export default {
           that.customRheight = that.canvasHeight / img.height
           that.canvasstyle = 'position: absolute;left: ' +
             canvasleft + '; top: ' + canvastop + ';' // canvas浮动定位
+          console.log('that.canvasHeight:' + that.canvasHeight)
+          console.log('that.DivHeight:' + that.DivHeight)
+          that.DivHeight = that.canvasHeight
         }
       })
     },
@@ -215,6 +225,41 @@ export default {
       for (var myindex in labelInfoTemp) {
         this.nameList.push(labelInfoTemp[myindex].name)
       }
+    },
+    // 鼠标按下时执行
+    mousedown (e) {
+      this.isMouseDownInCanvas = true
+      // 鼠标按下时开始位置与结束位置相同 防止鼠标在画完矩形后 点击图画形成第二个图形
+      this.endX = e.offsetX
+      this.endY = e.offsetY
+      this.startX = e.offsetX
+      this.startY = e.offsetY
+      this.mousemove(e)
+    },
+    // 鼠标移动式时执行
+    mousemove (e) {
+      if (this.isMouseDownInCanvas) { // 当鼠标有按下操作时执行
+        this.endX = e.offsetX
+        this.endY = e.offsetY
+        var wwidth = this.endX - this.startX
+        var wheigth = this.endY - this.startY
+        // 清除指定区域的所有像素
+        this.customcxt.clearRect(0, 0, this.DivWidth, this.DivHeight)
+        this.customcxt.strokeStyle = ' #00ff00' // 矩形框颜色
+        this.customcxt.lineWidth = '2' // 矩形框宽度
+        this.customcxt.strokeRect(this.startX, this.startY, wwidth, wheigth) // 绘制矩形
+      }
+    },
+    // 鼠标松开时执行
+    mouseup (e) {
+      this.isMouseDownInCanvas = false
+      console.log('this.startX:' + this.startX)
+      console.log('this.startY:' + this.startY)
+      console.log('this.endX:' + this.endX)
+      console.log('this.endY:' + this.endY)
+    },
+    Mouseleave (e) {
+      this.isMouseDownInCanvas = false
     }
   }
 }

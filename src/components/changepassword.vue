@@ -77,6 +77,7 @@ export default {
       }
     }
     return {
+      userId: '',
       ruleForm: {
         pass: '',
         checkPass: '',
@@ -97,6 +98,9 @@ export default {
       }
     }
   },
+  created () {
+    this.userId = this.$route.query.userId
+  },
   methods: {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
@@ -114,8 +118,7 @@ export default {
     async changepassword (formName) {
       var { data: res } = await this.$http.post('user/changePassWord',
         {
-          // 以后改成从localsession里获取
-          id: '10000',
+          id: this.userId,
           oldpassword: this.ruleForm.oldpass,
           newpassword: this.ruleForm.pass
         })

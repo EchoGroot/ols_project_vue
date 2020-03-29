@@ -10,10 +10,10 @@ import './assets/css/jquery.imageLabel.min.css'
 // import $ from 'jquery'
 
 Vue.config.productionTip = false
-axios.defaults.baseURL = 'http://127.0.0.1:8080/'
+// 生产环境使用
+axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? '/ols_project/' : ''
 axios.defaults.withCredentials = true
 Vue.prototype.$http = axios
-// Vue.prototype.$ = $
 
 new Vue({
   router,

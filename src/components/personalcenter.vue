@@ -21,7 +21,7 @@
           :default-active='1+""'
           :router="true"
         >
-          <el-menu-item index="/personalinfo">
+          <el-menu-item :index="personalinfoIndex">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>个人信息</span>
@@ -34,13 +34,13 @@
               <span>已接受任务</span>
             </template>
             <!-- 二级子菜单 -->
-            <el-menu-item index="/acceptetasklist/acceptfinish">
+            <el-menu-item :index="acceptfinishIndex">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>已完成</span>
               </template>
             </el-menu-item>
-            <el-menu-item index="/acceptetasklist/acceptnotfinish">
+            <el-menu-item :index="acceptnotfinishIndex">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>未完成</span>
@@ -54,13 +54,13 @@
               <span>已发布任务</span>
             </template>
             <!-- 二级子菜单 -->
-            <el-menu-item index="/releasetasklist/releasefinish">
+            <el-menu-item :index="releasefinishIndex">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>已完成</span>
               </template>
             </el-menu-item>
-            <el-menu-item index="/releasetasklist/releasenotfinish">
+            <el-menu-item :index="releasenotfinishIndex">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>未完成</span>
@@ -87,8 +87,22 @@ export default {
   },
   data () {
     return {
+      userId: '',
+      personalinfoIndex: '/personalinfo',
+      acceptfinishIndex: '/acceptetasklist',
+      acceptnotfinishIndex: '/acceptetasklist',
+      releasefinishIndex: '/releasetasklist',
+      releasenotfinishIndex: '/releasetasklist',
       isRouterAlive: true
     }
+  },
+  created () {
+    this.userId = this.$route.query.userId
+    this.personalinfoIndex += '?userId=' + this.userId
+    this.acceptfinishIndex += '?userId=' + this.userId + '&query=acceptfinish'
+    this.acceptnotfinishIndex += '?userId=' + this.userId + '&query=acceptnotfinish'
+    this.releasefinishIndex += '?userId=' + this.userId + '&query=releasefinish'
+    this.releasenotfinishIndex += '?userId=' + this.userId + '&query=releasenotfinish'
   },
   methods: {
     reload () {

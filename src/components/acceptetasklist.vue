@@ -134,7 +134,7 @@ export default {
     }
   },
   watch: {
-    '$route.params.query': function (newVal, oldVal) {
+    '$route.query': function (newVal, oldVal) {
       console.log('路由参数发生改变' + oldVal + '->' + newVal)
       this.reload()
     }
